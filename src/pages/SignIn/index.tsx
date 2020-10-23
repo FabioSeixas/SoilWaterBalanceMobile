@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { View, Image, KeyboardAvoidingView, Platform } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
+import { useNavigation } from '@react-navigation/native';
+import { Form } from '@unform/mobile';
+import { FormHandles } from '@unform/core';
 import {
   Container,
   Title,
@@ -17,6 +20,13 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 
 const SignIn: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
+  const navigation = useNavigation();
+
+  const handleSignIn = useCallback((data: object) => {
+    console.log(data);
+  }, []);
+
   return (
     <>
       <KeyboardAvoidingView
@@ -30,10 +40,14 @@ const SignIn: React.FC = () => {
             <Title>Welcome!</Title>
           </View>
 
-          <Input name="email" icon="mail" placeholder="Email" />
-          <Input name="senha" icon="lock" placeholder="Senha" />
+          <Form ref={formRef} onSubmit={handleSignIn}>
+            <Input name="email" icon="mail" placeholder="Email" />
+            <Input name="password" icon="lock" placeholder="Password" />
 
-          <Button>Sign In</Button>
+            <Button onPress={() => formRef.current?.submitForm()}>
+              Sign In
+            </Button>
+          </Form>
 
           <ForgotPassword>
             <ForgotPasswordText>Forgot your password?</ForgotPasswordText>
@@ -41,7 +55,7 @@ const SignIn: React.FC = () => {
         </Container>
       </KeyboardAvoidingView>
 
-      <CreateAccount>
+      <CreateAccount onPress={() => navigation.navigate('SignUp')}>
         <Icon name="log-in" size={20} color="#8A969E" />
         <CreateAccountText>Create a new Account</CreateAccountText>
       </CreateAccount>
