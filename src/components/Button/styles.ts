@@ -14,6 +14,15 @@ export const Container = styled(RectButton)`
   flex-direction: row;
 `;
 
+export const ButtonView = styled.View`
+  background-color: transparent;
+  width: 100%;
+
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+`;
+
 export const ButtonText = styled.Text`
   color: #fff;
   font-size: 18px;
