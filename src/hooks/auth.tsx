@@ -33,19 +33,22 @@ export const AuthProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const signIn = useCallback(async ({ email, password }) => {
-    const response = await api.post('/sessions', { email, password });
+    const response = await api.post('/session', { email, password });
     const { token, user } = response.data;
 
     await AsyncStorage.multiSet([
-      ['@GoBarber:token', token],
-      ['@GoBarber:user', JSON.stringify(user)],
+      ['@SoilWaterBalance:token', token],
+      ['@SoilWaterBalance:user', JSON.stringify(user)],
     ]);
 
     setData({ token, user });
   }, []);
 
   const signOut = useCallback(async () => {
-    await AsyncStorage.multiRemove(['@Gobarber:token', '@Gobarber:user']);
+    await AsyncStorage.multiRemove([
+      '@SoilWaterBalance:token',
+      '@SoilWaterBalance:user',
+    ]);
 
     setData({} as AuthState);
   }, []);
@@ -53,8 +56,8 @@ export const AuthProvider: React.FC = ({ children }) => {
   useEffect(() => {
     async function loadStorageAsync(): Promise<void> {
       const [token, user] = await AsyncStorage.multiGet([
-        '@GoBarber:token',
-        '@GoBarber:user',
+        '@SoilWaterBalance:token',
+        '@SoilWaterBalance:user',
       ]);
 
       if (token[1] && user[1]) {
