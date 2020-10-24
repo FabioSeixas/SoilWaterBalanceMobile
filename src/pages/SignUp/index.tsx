@@ -5,12 +5,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  Alert,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import { useNavigation } from '@react-navigation/native';
+import * as Yup from 'yup';
+
+import getValidationError from '../../utils/getValidationError';
 import { Container, Title, BackToLogin, BackToLoginText } from './styles';
 
 import logo from '../../assets/logo.png';
@@ -18,14 +22,51 @@ import logo from '../../assets/logo.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
+interface SignUpData {
+  username: string;
+  email: string;
+  password: string;
+}
+
 const SignUp: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
-  const handleSignUp = useCallback((data: object) => {
-    console.log(data);
+  const handleSignUp = useCallback(async (data: SignUpData) => {
+    formRef.current?.setErrors({});
+    try {
+      const schema = Yup.object().shape({
+        username: Yup.string().required('Name is required.'),
+        email: Yup.string()
+          .required('Email is required')
+          .email('Inform a valid email'),
+        password: Yup.string().min(
+          6,
+          'Password must have at least 6 characters',
+        ),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      // await api.post('/users', {
+      //   username: data.username,
+      //   email: data.email,
+      //   password: data.password,
+      // });
+
+      // history.push('/');
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const error = getValidationError(err);
+        formRef.current?.setErrors(error);
+        return;
+      }
+      Alert.alert('Error', 'An error occurred. Try again.');
+    }
   }, []);
 
   return (
