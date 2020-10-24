@@ -115,7 +115,7 @@ const SignIn: React.FC = () => {
       </KeyboardAvoidingView>
 
       <CreateAccount onPress={() => navigation.navigate('SignUp')}>
-        <Icon name="log-in" size={20} color="#8A969E" />
+        <Icon name="log-in" size={20} color="#020202" />
         <CreateAccountText>Create a new Account</CreateAccountText>
       </CreateAccount>
     </>

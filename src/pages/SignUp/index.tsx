@@ -14,6 +14,7 @@ import { FormHandles } from '@unform/core';
 import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
 
+import api from '../../services/api';
 import getValidationError from '../../utils/getValidationError';
 import { Container, Title, BackToLogin, BackToLoginText } from './styles';
 
@@ -34,40 +35,39 @@ const SignUp: React.FC = () => {
   const passwordInputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
-  const handleSignUp = useCallback(async (data: SignUpData) => {
-    formRef.current?.setErrors({});
-    try {
-      const schema = Yup.object().shape({
-        username: Yup.string().required('Name is required.'),
-        email: Yup.string()
-          .required('Email is required')
-          .email('Inform a valid email'),
-        password: Yup.string().min(
-          6,
-          'Password must have at least 6 characters',
-        ),
-      });
+  const handleSignUp = useCallback(
+    async (data: SignUpData) => {
+      formRef.current?.setErrors({});
+      try {
+        const schema = Yup.object().shape({
+          username: Yup.string().required('Name is required.'),
+          email: Yup.string()
+            .required('Email is required')
+            .email('Inform a valid email'),
+          password: Yup.string().min(
+            6,
+            'Password must have at least 6 characters',
+          ),
+        });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      // await api.post('/users', {
-      //   username: data.username,
-      //   email: data.email,
-      //   password: data.password,
-      // });
+        await api.post('/users', data);
 
-      // history.push('/');
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const error = getValidationError(err);
-        formRef.current?.setErrors(error);
-        return;
+        navigation.goBack();
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const error = getValidationError(err);
+          formRef.current?.setErrors(error);
+          return;
+        }
+        Alert.alert('Error', 'An error occurred. Try again.');
       }
-      Alert.alert('Error', 'An error occurred. Try again.');
-    }
-  }, []);
+    },
+    [navigation],
+  );
 
   return (
     <>
@@ -88,7 +88,7 @@ const SignUp: React.FC = () => {
             style={{ alignItems: 'center' }}
           >
             <Input
-              name="name"
+              name="username"
               icon="user"
               placeholder="Name"
               autoCorrect={false}
